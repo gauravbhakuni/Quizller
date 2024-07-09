@@ -1,9 +1,13 @@
 <?php
     session_start();
-    if(!isset($_SESSION['student_details']))
-        header("Location: ../index.php"); 
-    if(isset($_SESSION['test_ongoing']))
-        header("Location: quiz.php"); 
+    if(!isset($_SESSION['student_details'])) {
+        header("Location: ../index.php");
+        exit;
+    }
+    if(isset($_SESSION['test_ongoing'])) {
+        header("Location: quiz.php");
+        exit;
+    }
 ?>
 <html>
 
@@ -20,21 +24,16 @@
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
     <script src="../vendor/tilt/tilt.jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@beta/dist/js.cookie.min.js"></script>
-
 </head>
 
 <body>
     <!-- Header -->
     <header class="header1">
-        <!-- Header desktop -->
         <div class="container-menu-header">
             <div class="wrap_header">
-                <!-- Logo -->
                 <a href="../index.php" class="logo">
                     <img src="../images/icons/logo.png" alt="IMG-LOGO">
                 </a>
-
-                <!-- Header Icon -->
                 <div class="header-icons">
                     <a href="#" class="header-wrapicon1 dis-block">
                         <img src="../images/icons/logout.png" class="header-icon1" alt="ICON" onclick='logout()'>
@@ -42,24 +41,17 @@
                 </div>
             </div>
         </div>
-
-        <!-- Header Mobile -->
         <div class="wrap_header_mobile">
-            <!-- Logo moblie -->
             <a href="../index.php" class="logo-mobile">
                 <img src="../images/icons/logo.png" alt="IMG-LOGO">
             </a>
-
-            <!-- Button show menu -->
             <div class="btn-show-menu">
-                <!-- Header Icon mobile -->
                 <div class="header-icons-mobile">
                     <a href="#" class="header-wrapicon1 dis-block">
-                        <img src="../images/icons/logout.png" class="header-icon1" alt="ICON" onclick = 'logout()'>
+                        <img src="../images/icons/logout.png" class="header-icon1" alt="ICON" onclick='logout()'>
                     </a>
                 </div>
             </div>
-        </div>
         </div>
     </header>
     <section>
@@ -72,21 +64,20 @@
                                 <div class="container">
                                     <div class="row">
                                         <div class="col-md-12" id="row" style="display:none;">
-                                                <div class="card" style="background: #ededed;margin:20px 10px 0px 10px;">
-                                                    <div class="card-body">
-                                                        <div class="container">
-                                                            <div class="row">
-                                                                <div class="col-md-8">
-                                                                        <p id="test_name"></p>
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                        <a href="quiz.php"><button type="button" class="btn btn-success" style="float:right;">Start Test</button></a>
-                                                                </div>
+                                            <div class="card" style="background: #ededed;margin:20px 10px 0px 10px;">
+                                                <div class="card-body">
+                                                    <div class="container">
+                                                        <div class="row">
+                                                            <div class="col-md-8">
+                                                                <p id="test_name"></p>
                                                             </div>
-                                                            
+                                                            <div class="col-md-4">
+                                                                <a href="quiz.php"><button type="button" class="btn btn-success" style="float:right; color:black;">Start Test</button></a>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -99,24 +90,20 @@
     </section>
 
     <script>
-        function isEmpty(str) {
-            return (!str || 0 === str.length);
-        }
-
         $(document).ready(function () {
             $.ajax({
                 type: 'POST',
                 url: 'get_dashboard_contents.php',
                 success: function (response) {
-                    console.log('hi');
-                    console.log(response);
-                    console.log(response.length);
+                    console.log('Response received:', response);
                     if(response.length > 0) {
-                        console.log('not');
-                        var temp = document.getElementById('row');
-                        temp.style.display = 'block';
+                        console.log('Displaying test details');
+                        $('#row').show();
                         $('#test_name').text(response);
                     }
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
                 }
             });
         });
@@ -125,37 +112,19 @@
             $.ajax({
                 type: 'POST',
                 url: 'end_session.php',
-                data: {
-                    'message': '1',
-                },
+                data: { 'message': '1' },
                 success: function (msg) {
                     alert(msg);
                     Cookies.remove('last_question_was_answered');
                     Cookies.remove('last_question');
                     Cookies.set('test_submitted_status', msg.toString());
                     window.location.replace("test_finished.php");
+                },
+                error: function (xhr, status, error) {
+                    console.error('Logout Error:', status, error);
                 }
             });
         }
-
-
-      
-        <?php
-    session_start();
-    
-    if($_SESSION['test_ongoing']  == "true"){
-        echo "Test Ongoing";
-        header("Location: quiz.php");
-    }else if(!isset($_SESSION['student_details'])){
-        echo "You are not logged in";
-        header("Location: ../index.php");
-    }
-
-    function createCard(array $row) { ?>
-  
-<?php } ?>
-
     </script>
 </body>
-
 </html>
